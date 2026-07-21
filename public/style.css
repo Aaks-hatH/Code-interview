@@ -7,6 +7,7 @@
   --muted: #52616f;
   --accent: #1f5f99;
   --danger: #a83232;
+  --warn: #8a6d1f;
 }
 * { box-sizing: border-box; }
 body {
@@ -14,6 +15,10 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   background: var(--bg);
   color: var(--text);
+  user-select: none;
+}
+input, textarea {
+  user-select: text;
 }
 main {
   width: min(1120px, 94vw);
@@ -67,6 +72,23 @@ textarea {
   tab-size: 2;
 }
 .written-box { min-height: 180px; }
+.checkbox-group {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #9aa8b6;
+  border-radius: 4px;
+  padding: 12px;
+  background: #ffffff;
+}
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 400;
+  color: var(--text);
+  margin: 0;
+}
+.checkbox-option input { width: auto; }
 button {
   border: 1px solid #17476f;
   border-radius: 4px;
@@ -99,6 +121,16 @@ button:hover { background: #17476f; }
   background: #eef5fb;
   border-radius: 4px;
   color: #24384a;
+  margin-top: 14px;
+}
+.notice.warn {
+  border-left-color: var(--danger);
+  background: #fbeeee;
+  color: #5c1f1f;
+  font-weight: 700;
+}
+.notice.warn button {
+  margin-top: 10px;
 }
 .count { font-weight: 700; }
 .meta {
@@ -115,7 +147,45 @@ button:hover { background: #17476f; }
   font-size: 0.82rem;
   font-weight: 700;
 }
+.badge {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #eef1f5;
+  color: #17476f;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.badge.muted { background: #f3f3f3; color: var(--muted); }
+.badge-easy, .badge-medium, .badge-hard {
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.badge-easy { background: #e6f4ea; color: #226b3d; }
+.badge-medium { background: #fdf1de; color: var(--warn); }
+.badge-hard { background: #fbeaea; color: var(--danger); }
 .flag { color: var(--danger); }
+.partial { color: #8a6d1f; }
+.breakdown {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}
+.review-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.review-form textarea { min-height: 80px; }
+.save-status {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -127,4 +197,50 @@ pre {
   border: 1px solid var(--border);
   padding: 14px;
   overflow: auto;
+}
+
+/* Track picker on the start screen */
+.track-picker {
+  border: none;
+  padding: 0;
+  margin: 18px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+.track-picker legend {
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 8px;
+  padding: 0;
+}
+.track-option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  align-items: start;
+  border: 1px solid #9aa8b6;
+  border-radius: 6px;
+  padding: 14px;
+  margin: 0;
+  cursor: pointer;
+  font-weight: 400;
+}
+.track-option:has(input:checked) {
+  border-color: var(--accent);
+  background: #eef5fb;
+}
+.track-option input { width: auto; grid-row: 1 / span 2; margin-top: 4px; }
+.track-title { font-weight: 700; color: var(--text); }
+.track-desc { color: var(--muted); font-size: 0.9rem; }
+
+/* Honeypot field: present in the DOM for bots/automation to find, invisible
+   and unreachable for real candidates using the real UI. */
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  height: 0;
+  width: 0;
+  overflow: hidden;
 }
