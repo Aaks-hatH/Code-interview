@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admissions Portal</title>
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <p class="eyebrow">Reviewer Console</p>
+        <h1>Admissions Portal</h1>
+        <p>Enter the server-side bearer token to review submissions, scores, and integrity reports.</p>
+      </section>
+      <section class="card">
+        <label>Admin token<input id="token" type="password"></label>
+        <button id="load">Load reports</button>
+      </section>
+      <section id="reports" class="grid"></section>
+    </main>
+    <script src="/admin.js"></script>
+  </body>
+</html>

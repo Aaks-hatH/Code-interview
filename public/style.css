@@ -1,0 +1,130 @@
+:root {
+  color-scheme: light;
+  --bg: #f4f6f8;
+  --panel: #ffffff;
+  --border: #c8d0da;
+  --text: #17202a;
+  --muted: #52616f;
+  --accent: #1f5f99;
+  --danger: #a83232;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+main {
+  width: min(1120px, 94vw);
+  margin: auto;
+  padding: 28px 0 48px;
+}
+.hero, .card, .question {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 24px;
+  margin: 18px 0;
+}
+.eyebrow {
+  color: var(--muted);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.05;
+  margin: 0.2em 0;
+}
+h2, h3 { line-height: 1.25; }
+label {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+input, textarea, select {
+  width: 100%;
+  border: 1px solid #9aa8b6;
+  background: #ffffff;
+  color: var(--text);
+  border-radius: 4px;
+  padding: 12px;
+  font: inherit;
+}
+textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+.code-box {
+  min-height: 260px;
+  font-family: Consolas, Monaco, monospace;
+  line-height: 1.45;
+  tab-size: 2;
+}
+.written-box { min-height: 180px; }
+button {
+  border: 1px solid #17476f;
+  border-radius: 4px;
+  padding: 12px 18px;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--accent);
+  cursor: pointer;
+}
+button:hover { background: #17476f; }
+.hidden { display: none; }
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: space-between;
+  align-items: center;
+  margin: 18px 0;
+  padding: 14px 18px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.notice {
+  border-left: 4px solid var(--accent);
+  padding: 12px 16px;
+  background: #eef5fb;
+  border-radius: 4px;
+  color: #24384a;
+}
+.count { font-weight: 700; }
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.meta span {
+  padding: 5px 8px;
+  border-radius: 4px;
+  background: #eef1f5;
+  color: #324a5f;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.flag { color: var(--danger); }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+}
+pre {
+  white-space: pre-wrap;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  padding: 14px;
+  overflow: auto;
+}

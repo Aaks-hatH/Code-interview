@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Technical Interview Test</title>
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <p class="eyebrow">Admissions technical assessment</p>
+        <h1>Technical Interview Test</h1>
+        <p>This test covers HTML, CSS, JavaScript, cybersecurity, debugging, independent coding, and assisted coding. Answer every question before submitting.</p>
+        <p id="question-count" class="count">Loading question count.</p>
+        <div class="notice" id="notice"></div>
+      </section>
+      <section id="start" class="card">
+        <h2>Candidate check-in</h2>
+        <label>Full name<input id="name" autocomplete="name" required></label>
+        <label>Email<input id="email" type="email" autocomplete="email" required></label>
+        <label>Target role<input id="role" placeholder="Frontend Security Intern"></label>
+        <button id="begin" type="button">Begin test</button>
+      </section>
+      <section id="exam" class="hidden">
+        <div class="topbar">
+          <strong id="candidate"></strong>
+          <span id="timer">00:00</span>
+          <span id="progress">0 answered</span>
+          <span id="flags">Integrity signals: 0</span>
+        </div>
+        <form id="questions"></form>
+        <button id="submit" type="button">Submit final test</button>
+        <pre id="result"></pre>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
