@@ -11,25 +11,59 @@
       <section class="hero">
         <p class="eyebrow">Admissions technical assessment</p>
         <h1>Technical Interview Test</h1>
-        <p>This test covers HTML, CSS, JavaScript, cybersecurity, debugging, independent coding, and assisted coding. Answer every question before submitting.</p>
+        <p>Choose one track below. Each track is a standalone, timed assessment &mdash; you only need to complete the one that matches what you are being evaluated for.</p>
         <p id="question-count" class="count">Loading question count.</p>
         <div class="notice" id="notice"></div>
+        <div class="notice warn" id="lockdown-notice">
+          This test runs in a monitored, full-screen lockdown mode. Tab switches, window focus loss, copy/paste, right-click,
+          exiting full screen, and other integrity signals are logged with timestamps and reviewed by a human before any
+          result is finalized. Repeated flags automatically route your submission to mandatory manual review.
+        </div>
       </section>
+
       <section id="start" class="card">
         <h2>Candidate check-in</h2>
         <label>Full name<input id="name" autocomplete="name" required></label>
         <label>Email<input id="email" type="email" autocomplete="email" required></label>
         <label>Target role<input id="role" placeholder="Frontend Security Intern"></label>
+
+        <!-- Honeypot: real candidates never see or fill this field. Left
+             visually and structurally hidden from assistive tech too. -->
+        <div aria-hidden="true" class="honeypot">
+          <label>Website<input id="website" tabindex="-1" autocomplete="off"></label>
+        </div>
+
+        <fieldset id="track-picker" class="track-picker">
+          <legend>Choose your track</legend>
+          <label class="track-option">
+            <input type="radio" name="track" value="coding">
+            <span class="track-title">Software Coding</span>
+            <span class="track-desc">HTML/CSS/JavaScript/Python fundamentals, algorithms, debugging, and system design.</span>
+          </label>
+          <label class="track-option">
+            <input type="radio" name="track" value="cybersecurity">
+            <span class="track-title">Cybersecurity</span>
+            <span class="track-desc">Advanced application security, cryptography, vulnerability analysis, and incident response.</span>
+          </label>
+        </fieldset>
+
         <button id="begin" type="button">Begin test</button>
+        <p id="start-error" class="flag"></p>
       </section>
+
       <section id="exam" class="hidden">
         <div class="topbar">
           <strong id="candidate"></strong>
+          <span id="track-badge" class="badge"></span>
           <span id="timer">00:00</span>
           <span id="progress">0 answered</span>
-          <span id="flags">Integrity signals: 0</span>
+          <span id="integrity-counter" class="badge muted" title="Every action below is logged for reviewer integrity checks">0 flags logged</span>
         </div>
-        <form id="questions"></form>
+        <div id="fullscreen-warning" class="notice warn hidden">
+          You have left full-screen mode. This has been logged. Click below to resume the exam in full screen.
+          <button id="resume-fullscreen" type="button">Resume full screen</button>
+        </div>
+        <form id="questions" autocomplete="off"></form>
         <button id="submit" type="button">Submit final test</button>
         <pre id="result"></pre>
       </section>
