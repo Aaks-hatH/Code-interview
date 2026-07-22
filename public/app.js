@@ -4,6 +4,10 @@ let flagCount = 0;
 let started = 0;
 let lastSize = { w: innerWidth, h: innerHeight };
 let devtoolsWarned = false;
+let currentIndex = 0;
+let answers = {};
+let questionEnteredAt = 0;
+let hiddenAt = null; // timestamp when the tab/window was last hidden or lost focus
 
 const $ = id => document.getElementById(id);
 const escapeHtml = value => String(value).replace(/[&<>'"]/g, char => ({
@@ -19,52 +23,158 @@ async function api(url, options = {}) {
     headers: { 'content-type': 'application/json' },
     ...options
   });
-  if (!response.ok) throw new Error(await response.text());
+  if (!response.ok) {
+    let message = 'Request failed';
+    try { message = (await response.json()).error || message; } catch {}
+    const error = new Error(message);
+    error.serverMessage = message;
+    throw error;
+  }
   return response.json();
 }
 
-function answerControl(question) {
+// --- Email validation (client-side, mirrors server rules for instant feedback) ---
+const EMAIL_FORMAT = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+const DISPOSABLE_EMAIL_DOMAINS = new Set([
+  'mailinator.com', 'guerrillamail.com', 'guerrillamail.info', '10minutemail.com',
+  '10minutemail.net', 'tempmail.com', 'temp-mail.org', 'throwawaymail.com',
+  'yopmail.com', 'trashmail.com', 'getnada.com', 'fakeinbox.com', 'sharklasers.com',
+  'maildrop.cc', 'dispostable.com', 'mintemail.com', 'mailnesia.com', 'moakt.com',
+  'test.com', 'example.com', 'domain.com', 'fake.com', 'notreal.com'
+]);
+function checkEmail(rawEmail) {
+  const email = String(rawEmail || '').trim();
+  if (!email) return 'Email is required.';
+  if (!EMAIL_FORMAT.test(email)) return 'Enter a valid email address (e.g. name@company.com).';
+  const domain = email.split('@')[1].toLowerCase();
+  if (DISPOSABLE_EMAIL_DOMAINS.has(domain)) return 'Please use your real, permanent email address, not a disposable or placeholder one.';
+  if (!domain.includes('.')) return 'Enter a valid email address (e.g. name@company.com).';
+  const tld = domain.split('.').pop();
+  if (tld.length < 2 || /\d/.test(tld)) return 'Enter a valid email address (e.g. name@company.com).';
+  const local = email.split('@')[0];
+  if (/^(.)\1{5,}$/.test(local)) return 'Enter a valid email address (e.g. name@company.com).';
+  return '';
+}
+function validateEmailField() {
+  const message = checkEmail($('email').value);
+  $('email-error').textContent = message;
+  $('email').setAttribute('aria-invalid', message ? 'true' : 'false');
+  return !message;
+}
+$('email').addEventListener('blur', validateEmailField);
+$('email').addEventListener('input', () => {
+  // Once an error is showing, re-validate on every keystroke so it clears
+  // as soon as the address becomes valid rather than waiting for blur again.
+  if ($('email-error').textContent) validateEmailField();
+});
+
+function answerControl(question, savedValue) {
   if (question.type === 'mcq' || question.type === 'true-false') {
-    return `<select name="${escapeHtml(question.id)}" required><option value="">Choose one answer</option>${question.choices.map(choice => `<option>${escapeHtml(choice)}</option>`).join('')}</select>`;
+    return `<select name="${escapeHtml(question.id)}" required>
+      <option value="">Choose one answer</option>
+      ${question.choices.map(choice => `<option ${savedValue === choice ? 'selected' : ''}>${escapeHtml(choice)}</option>`).join('')}
+    </select>`;
   }
   if (question.type === 'multi-select') {
+    const savedArr = Array.isArray(savedValue) ? savedValue : (savedValue ? [savedValue] : []);
     return `<div class="checkbox-group">${question.choices.map((choice, index) => `
-      <label class="checkbox-option"><input type="checkbox" name="${escapeHtml(question.id)}" value="${escapeHtml(choice)}" id="${escapeHtml(question.id)}-${index}"> ${escapeHtml(choice)}</label>
+      <label class="checkbox-option"><input type="checkbox" name="${escapeHtml(question.id)}" value="${escapeHtml(choice)}" id="${escapeHtml(question.id)}-${index}" ${savedArr.includes(choice) ? 'checked' : ''}> ${escapeHtml(choice)}</label>
     `).join('')}</div>`;
   }
   const label = question.type === 'code' ? `Code answer${question.language ? ` (${question.language})` : ''}` : 'Written answer';
   const className = question.type === 'code' ? 'code-box' : 'written-box';
-  return `<label class="answer-label">${label}<textarea class="${className}" name="${escapeHtml(question.id)}" spellcheck="false" placeholder="Write your complete answer here" required></textarea></label>`;
+  return `<label class="answer-label">${label}<textarea class="${className}" name="${escapeHtml(question.id)}" spellcheck="false" placeholder="Write your complete answer here" required>${escapeHtml(savedValue || '')}</textarea></label>`;
 }
 
 function difficultyBadgeClass(difficulty) {
   return difficulty === 'hard' ? 'badge-hard' : difficulty === 'medium' ? 'badge-medium' : 'badge-easy';
 }
 
-function updateProgress() {
-  const data = new FormData($('questions'));
-  const answeredNames = new Set();
-  for (const [name, value] of data.entries()) {
-    if (String(value).trim()) answeredNames.add(name);
-  }
-  $('progress').textContent = `${answeredNames.size} of ${questions.length} answered`;
+function isQuestionAnswered(question) {
+  const value = answers[question.id];
+  if (Array.isArray(value)) return value.length > 0;
+  return Boolean(value && String(value).trim());
 }
 
-function render() {
-  $('questions').innerHTML = questions.map((question, index) => `
+function updateProgress() {
+  const answeredCount = questions.filter(isQuestionAnswered).length;
+  $('progress').textContent = `${answeredCount} of ${questions.length} answered`;
+}
+
+function renderDots() {
+  $('qnav-dots').innerHTML = questions.map((question, index) => {
+    const state = index === currentIndex ? 'current' : isQuestionAnswered(question) ? 'done' : 'todo';
+    return `<button type="button" class="qdot qdot-${state}" data-index="${index}" title="Question ${index + 1}${isQuestionAnswered(question) ? ' (answered)' : ''}">${index + 1}</button>`;
+  }).join('');
+  $('qnav-dots').querySelectorAll('.qdot').forEach(button => {
+    button.addEventListener('click', () => goToQuestion(Number(button.dataset.index)));
+  });
+}
+
+// Reads whatever is currently in the form for the on-screen question and
+// stores it in the answers map, keyed by question id.
+function captureCurrentAnswer() {
+  const question = questions[currentIndex];
+  if (!question) return;
+  const form = $('questions');
+  if (question.type === 'multi-select') {
+    answers[question.id] = Array.from(form.querySelectorAll(`input[name="${CSS.escape(question.id)}"]:checked`)).map(el => el.value);
+  } else if (question.type === 'mcq' || question.type === 'true-false') {
+    const select = form.querySelector(`select[name="${CSS.escape(question.id)}"]`);
+    answers[question.id] = select ? select.value : '';
+  } else {
+    const textarea = form.querySelector(`textarea[name="${CSS.escape(question.id)}"]`);
+    answers[question.id] = textarea ? textarea.value : '';
+  }
+}
+
+// Sends how long the candidate spent looking at the question they are
+// leaving. Fire-and-forget; timing is analytics for the reviewer, not
+// something that should ever block navigation.
+function reportTimeOnQuestion(index) {
+  const question = questions[index];
+  if (!question || !sessionId || !questionEnteredAt) return;
+  const seconds = (Date.now() - questionEnteredAt) / 1000;
+  api(`/api/sessions/${sessionId}/question-time`, {
+    method: 'POST',
+    body: JSON.stringify({ questionId: question.id, seconds })
+  }).catch(() => {});
+}
+
+function renderQuestion() {
+  const question = questions[currentIndex];
+  $('questions').innerHTML = `
     <article class="question">
       <div class="meta">
         <span>${escapeHtml(question.area)}</span>
         <span>${escapeHtml(question.type)}</span>
         ${question.difficulty ? `<span class="${difficultyBadgeClass(question.difficulty)}">${escapeHtml(question.difficulty)}</span>` : ''}
       </div>
-      <h3>${index + 1}. ${escapeHtml(question.prompt)}</h3>
-      ${answerControl(question)}
+      <h3>${currentIndex + 1}. ${escapeHtml(question.prompt)}</h3>
+      ${answerControl(question, answers[question.id])}
     </article>
-  `).join('');
-  $('questions').addEventListener('input', updateProgress);
+  `;
+  $('questions').addEventListener('input', () => { captureCurrentAnswer(); updateProgress(); renderDots(); });
+  $('qnav-label').textContent = `Question ${currentIndex + 1} of ${questions.length}`;
+  $('prev-question').disabled = currentIndex === 0;
+  const isLast = currentIndex === questions.length - 1;
+  $('next-question').classList.toggle('hidden', isLast);
+  $('submit').classList.toggle('hidden', !isLast);
   updateProgress();
+  renderDots();
+  questionEnteredAt = Date.now();
 }
+
+function goToQuestion(index) {
+  if (index === currentIndex) return;
+  captureCurrentAnswer();
+  reportTimeOnQuestion(currentIndex);
+  currentIndex = Math.max(0, Math.min(questions.length - 1, index));
+  renderQuestion();
+}
+
+$('prev-question').onclick = () => goToQuestion(currentIndex - 1);
+$('next-question').onclick = () => goToQuestion(currentIndex + 1);
 
 // Note: integrity events are still tracked and sent to the server exactly as
 // before (see sendEvent below) -- they are simply never surfaced to the
@@ -118,30 +228,48 @@ api('/api/config').then(config => {
 
 $('begin').onclick = async () => {
   const trackInput = document.querySelector('input[name="track"]:checked');
+  if (!validateEmailField()) {
+    $('start-error').textContent = 'Please fix the email address above before beginning.';
+    return;
+  }
+  if (!$('name').value.trim()) {
+    $('start-error').textContent = 'Please enter your full name.';
+    return;
+  }
   if (!trackInput) {
     $('start-error').textContent = 'Please choose a track before beginning.';
     return;
   }
   $('start-error').textContent = '';
-  const result = await api('/api/sessions', {
-    method: 'POST',
-    body: JSON.stringify({
-      name: $('name').value,
-      email: $('email').value,
-      role: $('role').value,
-      track: trackInput.value,
-      website: $('website').value // honeypot, always empty for real candidates
-    })
-  });
+  $('begin').disabled = true;
+  let result;
+  try {
+    result = await api('/api/sessions', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: $('name').value,
+        email: $('email').value,
+        role: $('role').value,
+        track: trackInput.value,
+        website: $('website').value // honeypot, always empty for real candidates
+      })
+    });
+  } catch (err) {
+    $('start-error').textContent = err.serverMessage || 'Something went wrong starting the test. Please try again.';
+    $('begin').disabled = false;
+    return;
+  }
   sessionId = result.id;
   questions = result.questions;
+  answers = {};
+  currentIndex = 0;
   $('candidate').textContent = `${$('name').value} | ${$('role').value || 'Candidate'}`;
   $('track-badge').textContent = trackInput.value === 'coding' ? 'Software Coding' : 'Cybersecurity';
   $('question-count').textContent = `${result.questionCount} total questions.`;
   $('start').classList.add('hidden');
   $('exam').classList.remove('hidden');
   started = Date.now();
-  render();
+  renderQuestion();
   updateIntegrityCounter();
   requestLockdownFullscreen();
   ping('session-start', `Candidate began interview (${trackInput.value})`, 'low');
@@ -152,14 +280,12 @@ $('resume-fullscreen').onclick = () => {
 };
 
 $('submit').onclick = async () => {
-  const data = new FormData($('questions'));
-  const answers = {};
-  for (const [name, value] of data.entries()) {
-    if (name in answers) {
-      answers[name] = Array.isArray(answers[name]) ? [...answers[name], value] : [answers[name], value];
-    } else {
-      answers[name] = value;
-    }
+  captureCurrentAnswer();
+  reportTimeOnQuestion(currentIndex);
+  const unanswered = questions.filter(q => !isQuestionAnswered(q));
+  if (unanswered.length) {
+    const proceed = confirm(`You have ${unanswered.length} unanswered question(s). Submit anyway?`);
+    if (!proceed) return;
   }
   $('submit').disabled = true;
   $('submit').textContent = 'Submitting...';
@@ -171,7 +297,8 @@ $('submit').onclick = async () => {
     $('result').textContent = 'Your submission has been received. Thank you for completing the assessment -- a reviewer will follow up with next steps. You may now close this tab.';
     $('result').classList.remove('hidden');
     $('submit').textContent = 'Submitted';
-    Array.from($('questions').elements).forEach(el => (el.disabled = true));
+    $('prev-question').disabled = true;
+    $('next-question').disabled = true;
   } catch {
     $('submit').disabled = false;
     $('submit').textContent = 'Submit final test';
@@ -184,9 +311,22 @@ $('submit').onclick = async () => {
 // --- Anti-cheat instrumentation -------------------------------------------
 
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) flag('visibility-hidden', 'Candidate left the interview tab', 'high');
+  if (document.hidden) {
+    hiddenAt = Date.now();
+    flag('visibility-hidden', 'Candidate left the interview tab', 'high');
+  } else if (hiddenAt) {
+    const awaySeconds = Math.round((Date.now() - hiddenAt) / 1000);
+    flag('visibility-restored', `Candidate returned to the interview tab after ${awaySeconds}s away`, awaySeconds > 30 ? 'high' : 'medium');
+    hiddenAt = null;
+  }
 });
 window.addEventListener('blur', () => flag('window-blur', 'Interview window lost focus', 'medium'));
+window.addEventListener('focus', () => {
+  // A blur without a matching visibilitychange (e.g. clicking a different
+  // app on the same desktop rather than switching tabs) is only observable
+  // via this focus event, so it gets its own "came back" signal too.
+  if (!document.hidden) flag('focus-restored', 'Interview window regained focus', 'low');
+});
 window.addEventListener('resize', () => {
   const deltaWidth = Math.abs(innerWidth - lastSize.w);
   const deltaHeight = Math.abs(innerHeight - lastSize.h);
@@ -239,6 +379,7 @@ document.addEventListener('keydown', event => {
       flag('fullscreen-exit', 'Candidate exited full-screen lockdown mode', 'high');
       $('fullscreen-warning').classList.remove('hidden');
     } else {
+      flag('fullscreen-restored', 'Candidate returned to full-screen lockdown mode', 'low');
       $('fullscreen-warning').classList.add('hidden');
     }
   });

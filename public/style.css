@@ -288,6 +288,257 @@ pre {
   font-size: 0.85rem;
 }
 
+.field-error {
+  color: var(--danger);
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: -6px 0 8px;
+  min-height: 1.1em;
+}
+input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+/* One-question-at-a-time navigation */
+.qnav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 16px 0 4px;
+}
+#qnav-label {
+  font-weight: 700;
+  color: var(--muted);
+}
+.qnav-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.qdot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid #9aa8b6;
+  background: #ffffff;
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0;
+  cursor: pointer;
+}
+.qdot:hover { border-color: var(--accent); }
+.qdot-done { background: #e6f4ea; border-color: #226b3d; color: #226b3d; }
+.qdot-current { background: var(--accent); border-color: #17476f; color: #ffffff; }
+.qdot-todo { background: #ffffff; }
+.qnav-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+button.secondary {
+  background: #ffffff;
+  color: var(--accent);
+}
+button.secondary:hover { background: #eef5fb; }
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- Admin overhaul: overview, legend, risk scoring, cards -------------- */
+
+.token-card { display: flex; align-items: flex-end; gap: 14px; }
+.token-card label { flex: 1; margin: 0; }
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  text-align: center;
+}
+.overview-grid .stat-value {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text);
+}
+.overview-grid .stat-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.legend {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin: 18px 0;
+  overflow: hidden;
+}
+.legend-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #eef5fb;
+  border: none;
+  border-radius: 0;
+  color: #17476f;
+  padding: 14px 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.legend-toggle:hover { background: #dfeefa; }
+.legend-chevron { transition: transform 0.15s ease; }
+.legend-toggle.open .legend-chevron { transform: rotate(180deg); }
+.legend-body { padding: 4px 18px 18px; }
+.legend-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.legend-table th, .legend-table td {
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.legend-table th { background: #eef1f5; }
+.legend-table code { font-size: 0.8rem; }
+
+.filters {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+}
+.filter-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--muted);
+  margin: 0;
+}
+.filter-label select { width: auto; padding: 8px 10px; }
+
+.conf-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.conf-certain { background: #fbeaea; color: var(--danger); }
+.conf-heuristic { background: #fdf1de; color: var(--warn); }
+.conf-info { background: #eef1f5; color: var(--muted); }
+
+.session-card { border-width: 1px; border-left-width: 6px; }
+.risk-border-clean { border-left-color: #226b3d; }
+.risk-border-low { border-left-color: #6c8a9c; }
+.risk-border-medium { border-left-color: var(--warn); }
+.risk-border-high { border-left-color: var(--danger); }
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.card-head h2 { margin: 0 0 4px; }
+.card-head-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.muted-note { color: var(--muted); font-size: 0.85rem; margin: 2px 0; }
+
+.risk-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.risk-clean { background: #e6f4ea; color: #226b3d; }
+.risk-low { background: #eef1f5; color: #4a6072; }
+.risk-medium { background: #fdf1de; color: var(--warn); }
+.risk-high { background: #fbeaea; color: var(--danger); }
+
+.status-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #eef1f5;
+  color: var(--muted);
+}
+.status-approved { background: #e6f4ea; color: #226b3d; }
+.status-flagged { background: #fbeaea; color: var(--danger); }
+.status-rejected { background: #2a2a2a; color: #ffffff; }
+.status-pending { background: #eef1f5; color: var(--muted); }
+
+.risk-panel {
+  background: #fbfaf3;
+  border: 1px solid #e6dfae;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin: 10px 0;
+  font-size: 0.9rem;
+}
+.risk-reasons { margin: 6px 0 0; padding-left: 20px; }
+.risk-reasons li { margin: 2px 0; }
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 14px 0;
+  padding: 14px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.stat { display: flex; flex-direction: column; gap: 2px; }
+.stat-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+}
+.stat-value { font-size: 1.25rem; font-weight: 800; color: var(--text); }
+.stat-value-sm { font-size: 0.9rem; font-weight: 700; }
+.stat-sub { font-size: 0.78rem; color: var(--muted); }
+
+.timing-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+.timing-table th, .timing-table td {
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  text-align: left;
+}
+.timing-table th { background: #eef1f5; }
+.timing-table tr.time-outlier td { background: #fdf6ea; }
+
 /* Honeypot field: present in the DOM for bots/automation to find, invisible
    and unreachable for real candidates using the real UI. */
 .honeypot {

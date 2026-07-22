@@ -13,11 +13,36 @@
         <h1>Admissions Portal</h1>
         <p>Enter the server-side bearer token to review submissions, track, difficulty-weighted scores, and integrity reports.</p>
       </section>
-      <section class="card">
+      <section class="card token-card">
         <label>Admin token<input id="token" type="password"></label>
         <button id="load">Load reports</button>
       </section>
       <section id="overview" class="overview"></section>
+      <section id="legend" class="legend hidden">
+        <button type="button" id="legend-toggle" class="legend-toggle">
+          <span>Flag glossary &mdash; what each integrity signal means</span>
+          <span class="legend-chevron">&#9662;</span>
+        </button>
+        <div id="legend-body" class="legend-body hidden"></div>
+      </section>
+      <section class="filters hidden" id="filters">
+        <label class="filter-label">Sort
+          <select id="sort-by">
+            <option value="recent">Most recent</option>
+            <option value="risk">Highest risk first</option>
+            <option value="score">Lowest score first</option>
+          </select>
+        </label>
+        <label class="filter-label">Show
+          <select id="filter-status">
+            <option value="all">All statuses</option>
+            <option value="pending">Pending only</option>
+            <option value="flagged">Flagged only</option>
+            <option value="approved">Approved only</option>
+            <option value="rejected">Rejected only</option>
+          </select>
+        </label>
+      </section>
       <section id="reports" class="grid"></section>
     </main>
     <script src="/admin.js"></script>

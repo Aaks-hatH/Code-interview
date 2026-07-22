@@ -19,7 +19,8 @@
       <section id="start" class="card">
         <h2>Candidate check-in</h2>
         <label>Full name<input id="name" autocomplete="name" required></label>
-        <label>Email<input id="email" type="email" autocomplete="email" required></label>
+        <label>Email<input id="email" type="email" autocomplete="email" required placeholder="you@company.com"></label>
+        <p id="email-error" class="field-error"></p>
         <label>Target role<input id="role" placeholder="Frontend Security Intern"></label>
 
         <!-- Honeypot: real candidates never see or fill this field. Left
@@ -58,8 +59,16 @@
           You have left full-screen mode. This has been logged. Click below to resume the exam in full screen.
           <button id="resume-fullscreen" type="button">Resume full screen</button>
         </div>
+        <div class="qnav">
+          <span id="qnav-label">Question 1 of 1</span>
+          <div class="qnav-dots" id="qnav-dots"></div>
+        </div>
         <form id="questions" autocomplete="off"></form>
-        <button id="submit" type="button">Submit final test</button>
+        <div class="qnav-buttons">
+          <button id="prev-question" type="button" class="secondary">Back</button>
+          <button id="next-question" type="button">Next question</button>
+          <button id="submit" type="button" class="hidden">Submit final test</button>
+        </div>
         <div id="result" class="notice hidden"></div>
       </section>
     </main>

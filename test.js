@@ -34,6 +34,24 @@ function fillAnswers(sessionQuestions) {
   return answers;
 }
 
+test('session creation rejects fake, malformed, or disposable emails and accepts real-looking ones', async () => {
+  const server = createServer().listen(0);
+  try {
+    const badEmails = ['not-an-email', 'missing-domain@', '@no-local-part.com', 'ada@test.com', 'ada@mailinator.com', 'aaaaaa@gmail.com', 'ada@nodothere'];
+    for (const email of badEmails) {
+      const res = await request(server, 'POST', '/api/sessions', { name: 'Ada', email, track: 'coding' });
+      assert.equal(res.statusCode, 400, `expected ${email} to be rejected`);
+    }
+    const goodEmails = ['ada.lovelace@gmail.com', 'a@b.co.uk', 'first.last+tag@company-name.io'];
+    for (const email of goodEmails) {
+      const res = await request(server, 'POST', '/api/sessions', { name: 'Ada', email, track: 'coding' });
+      assert.equal(res.statusCode, 200, `expected ${email} to be accepted`);
+    }
+  } finally {
+    server.close();
+  }
+});
+
 test('config exposes both selectable tracks without leaking answers', async () => {
   const server = createServer().listen(0);
   try {
@@ -51,14 +69,14 @@ test('config exposes both selectable tracks without leaking answers', async () =
 test('creating a session requires a valid track and returns only that track\'s questions', async () => {
   const server = createServer().listen(0);
   try {
-    const missingTrack = await request(server, 'POST', '/api/sessions', { name: 'Ada', email: 'ada@example.com' });
+    const missingTrack = await request(server, 'POST', '/api/sessions', { name: 'Ada', email: 'ada.lovelace@gmail.com' });
     assert.equal(missingTrack.statusCode, 400);
 
-    const badTrack = await request(server, 'POST', '/api/sessions', { name: 'Ada', email: 'ada@example.com', track: 'not-a-real-track' });
+    const badTrack = await request(server, 'POST', '/api/sessions', { name: 'Ada', email: 'ada.lovelace@gmail.com', track: 'not-a-real-track' });
     assert.equal(badTrack.statusCode, 400);
 
     for (const track of TRACKS) {
-      const create = await request(server, 'POST', '/api/sessions', { name: 'Ada', email: 'ada@example.com', track });
+      const create = await request(server, 'POST', '/api/sessions', { name: 'Ada', email: 'ada.lovelace@gmail.com', track });
       assert.equal(create.statusCode, 200);
       const { id, questions: sessionQuestions } = create.json();
       assert.ok(id);
@@ -77,7 +95,7 @@ test('creating a session requires a valid track and returns only that track\'s q
 test('coding sessions include JavaScript and Python code questions, and skew toward harder difficulty', async () => {
   const server = createServer().listen(0);
   try {
-    const create = await request(server, 'POST', '/api/sessions', { name: 'Ada', email: 'ada@example.com', track: 'coding' });
+    const create = await request(server, 'POST', '/api/sessions', { name: 'Ada', email: 'ada.lovelace@gmail.com', track: 'coding' });
     const { questions: sessionQuestions } = create.json();
     assert.ok(sessionQuestions.some(q => q.type === 'code' && q.language === 'javascript'));
     assert.ok(sessionQuestions.some(q => q.type === 'code' && q.language === 'python'));
@@ -105,7 +123,7 @@ test('JavaScript and Python code answers are both auto-graded against hidden tes
 test('harder questions are worth more than easy questions when scoring', async () => {
   const server = createServer().listen(0);
   try {
-    const create = await request(server, 'POST', '/api/sessions', { name: 'Ada', email: 'ada@example.com', track: 'cybersecurity' });
+    const create = await request(server, 'POST', '/api/sessions', { name: 'Ada', email: 'ada.lovelace@gmail.com', track: 'cybersecurity' });
     const { id, questions: sessionQuestions } = create.json();
     const answers = fillAnswers(sessionQuestions);
     const submit = await request(server, 'POST', `/api/sessions/${id}/submit`, { answers });
@@ -123,7 +141,7 @@ test('harder questions are worth more than easy questions when scoring', async (
 test('a burst of high-severity integrity events auto-flags the session for mandatory review', async () => {
   const server = createServer().listen(0);
   try {
-    const create = await request(server, 'POST', '/api/sessions', { name: 'Ada', email: 'ada@example.com', track: 'coding' });
+    const create = await request(server, 'POST', '/api/sessions', { name: 'Ada', email: 'ada.lovelace@gmail.com', track: 'coding' });
     const { id, questions: sessionQuestions } = create.json();
     for (let i = 0; i < 5; i++) {
       await request(server, 'POST', `/api/sessions/${id}/events`, { type: 'window-blur', detail: 'lost focus', severity: 'high' });
@@ -143,7 +161,7 @@ test('a burst of high-severity integrity events auto-flags the session for manda
 test('a populated honeypot field is recorded as a high-severity integrity event', async () => {
   const server = createServer().listen(0);
   try {
-    const create = await request(server, 'POST', '/api/sessions', { name: 'Ada', email: 'ada@example.com', track: 'coding', website: 'http://spam.example' });
+    const create = await request(server, 'POST', '/api/sessions', { name: 'Ada', email: 'ada.lovelace@gmail.com', track: 'coding', website: 'http://spam.example' });
     const { id } = create.json();
     const admin = await request(server, 'GET', '/api/admin/sessions', null, { authorization: `Bearer ${require('./server').ADMIN_TOKEN}` });
     const found = admin.json().sessions.find(s => s.id === id);
@@ -156,7 +174,7 @@ test('a populated honeypot field is recorded as a high-severity integrity event'
 test('session lifecycle scores and records integrity events without exposing them to the candidate response', async () => {
   const server = createServer().listen(0);
   try {
-    const create = await request(server, 'POST', '/api/sessions', { name: 'Ada', email: 'ada@example.com', track: 'cybersecurity' });
+    const create = await request(server, 'POST', '/api/sessions', { name: 'Ada', email: 'ada.lovelace@gmail.com', track: 'cybersecurity' });
     const { id, questions: sessionQuestions } = create.json();
     const event = await request(server, 'POST', `/api/sessions/${id}/events`, { type: 'window-blur', detail: 'lost focus', severity: 'high' });
     assert.equal(event.statusCode, 200);

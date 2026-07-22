@@ -390,6 +390,37 @@ function scoreAnswer(question, value = '') {
 
 function weightFor(question) { return DIFFICULTY_WEIGHT[question.difficulty] || 1; }
 
+// --- Email validation -------------------------------------------------------
+// Deliberately conservative: this is a format + plausibility check done
+// without any outbound network call (no SMTP handshake, no DNS/MX lookup),
+// so it cannot guarantee an inbox is real, but it does reject the vast
+// majority of junk (typos, made-up domains, throwaway/disposable mail
+// providers, and obviously fake input like "test@test.com").
+const EMAIL_FORMAT = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+const DISPOSABLE_EMAIL_DOMAINS = new Set([
+  'mailinator.com', 'guerrillamail.com', 'guerrillamail.info', '10minutemail.com',
+  '10minutemail.net', 'tempmail.com', 'temp-mail.org', 'throwawaymail.com',
+  'yopmail.com', 'trashmail.com', 'getnada.com', 'fakeinbox.com', 'sharklasers.com',
+  'maildrop.cc', 'dispostable.com', 'mintemail.com', 'mailnesia.com', 'moakt.com',
+  'test.com', 'example.com', 'domain.com', 'fake.com', 'notreal.com'
+]);
+function validateEmail(rawEmail) {
+  const email = String(rawEmail || '').trim();
+  if (!email) return { valid: false, reason: 'Email is required.' };
+  if (email.length > 254) return { valid: false, reason: 'Email is too long.' };
+  if (!EMAIL_FORMAT.test(email)) return { valid: false, reason: 'Enter a valid email address (e.g. name@company.com).' };
+  const domain = email.split('@')[1].toLowerCase();
+  if (DISPOSABLE_EMAIL_DOMAINS.has(domain)) return { valid: false, reason: 'Please use your real, permanent email address, not a disposable or placeholder one.' };
+  if (!domain.includes('.')) return { valid: false, reason: 'Enter a valid email address (e.g. name@company.com).' };
+  const tld = domain.split('.').pop();
+  if (tld.length < 2 || /\d/.test(tld)) return { valid: false, reason: 'Enter a valid email address (e.g. name@company.com).' };
+  // Repeated-character or keyboard-mash local parts ("aaaaaa@...") are a
+  // common fake-input pattern.
+  const local = email.split('@')[0];
+  if (/^(.)\1{5,}$/.test(local)) return { valid: false, reason: 'Enter a valid email address (e.g. name@company.com).' };
+  return { valid: true, email };
+}
+
 function send(res, code, payload, type = 'application/json') {
   res.writeHead(code, {
     'content-type': type,
@@ -436,7 +467,9 @@ async function handler(req, res) {
 
   if (req.method === 'POST' && url.pathname === '/api/sessions') {
     const body = await readBody(req);
-    if (!body.name || !body.email) return send(res, 400, { error: 'name and email required' });
+    if (!body.name || !String(body.name).trim()) return send(res, 400, { error: 'Name is required.' });
+    const emailCheck = validateEmail(body.email);
+    if (!emailCheck.valid) return send(res, 400, { error: emailCheck.reason });
     if (!TRACKS.includes(body.track)) return send(res, 400, { error: `track must be one of: ${TRACKS.join(', ')}` });
     // Honeypot: a hidden field the real UI never fills. If populated, this
     // is either an automated script or a candidate poking at hidden form
@@ -447,7 +480,7 @@ async function handler(req, res) {
     const session = {
       id,
       track: body.track,
-      candidate: { name: String(body.name).slice(0, 80), email: String(body.email).slice(0, 120), role: String(body.role || '').slice(0, 80) },
+      candidate: { name: String(body.name).trim().slice(0, 80), email: emailCheck.email.slice(0, 120), role: String(body.role || '').slice(0, 80) },
       startedAt: now(),
       startedAtMs: Date.now(),
       submittedAt: null,
@@ -455,6 +488,7 @@ async function handler(req, res) {
       questionIds: sessionQuestions.map(question => question.id),
       answers: {},
       events: [],
+      questionTimings: {},
       autoFlagged: false,
       score: null,
       breakdown: null,
@@ -478,6 +512,23 @@ async function handler(req, res) {
     }
     recordEvent(session, event);
     return send(res, 200, { ok: true, locked: session.autoFlagged });
+  }
+
+  match = url.pathname.match(/^\/api\/sessions\/([^/]+)\/question-time$/);
+  if (req.method === 'POST' && match) {
+    const session = sessions.get(match[1]);
+    if (!session) return send(res, 404, { error: 'not found' });
+    const body = await readBody(req);
+    const questionId = String(body.questionId || '');
+    const seconds = Number(body.seconds);
+    if (session.questionIds.includes(questionId) && Number.isFinite(seconds) && seconds >= 0) {
+      // Candidates can revisit a question (e.g. going back), so accumulate
+      // time across visits rather than overwrite, and separately track how
+      // many times they viewed it.
+      const existing = session.questionTimings[questionId] || { seconds: 0, visits: 0 };
+      session.questionTimings[questionId] = { seconds: Math.round((existing.seconds + seconds) * 10) / 10, visits: existing.visits + 1 };
+    }
+    return send(res, 200, { ok: true });
   }
 
   match = url.pathname.match(/^\/api\/sessions\/([^/]+)\/submit$/);
@@ -505,6 +556,7 @@ async function handler(req, res) {
       const value = session.answers[question.id];
       const points = scoreAnswer(question, value);
       const auto = question.type === 'code' ? runCodeTests(question.id, String(value || ''), question.language) : null;
+      const timing = session.questionTimings[question.id] || null;
       return {
         id: question.id,
         type: question.type,
@@ -515,7 +567,9 @@ async function handler(req, res) {
         auto,
         prompt: question.prompt,
         answerGiven: value === undefined ? null : value,
-        correctAnswer: question.answer === undefined ? null : question.answer
+        correctAnswer: question.answer === undefined ? null : question.answer,
+        secondsSpent: timing ? timing.seconds : null,
+        visits: timing ? timing.visits : 0
       };
     });
     const earned = session.breakdown.reduce((sum, item) => sum + item.points * item.weight, 0);
