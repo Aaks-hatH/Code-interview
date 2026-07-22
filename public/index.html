@@ -52,7 +52,7 @@
           <span id="track-badge" class="badge"></span>
           <span id="timer">00:00</span>
           <span id="progress">0 answered</span>
-          <span id="integrity-counter" class="badge muted" title="Every action below is logged for reviewer integrity checks">0 flags logged</span>
+          <span id="integrity-counter" class="badge muted" title="This session is monitored for integrity purposes and reviewed by a human">Session monitored</span>
         </div>
         <div id="fullscreen-warning" class="notice warn hidden">
           You have left full-screen mode. This has been logged. Click below to resume the exam in full screen.
@@ -60,7 +60,7 @@
         </div>
         <form id="questions" autocomplete="off"></form>
         <button id="submit" type="button">Submit final test</button>
-        <pre id="result"></pre>
+        <div id="result" class="notice hidden"></div>
       </section>
     </main>
     <script src="/app.js"></script>
