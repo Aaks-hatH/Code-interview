@@ -29,29 +29,29 @@ const MAX_REASONABLE_SESSION_SECONDS = 3 * 60 * 60;
 
 const codingMcq = [
   ['c-mcq-html-1', 'HTML', 'easy', 'Which element represents the main heading of a page?', ['<h1>', '<head>', '<title>', '<section>'], '<h1>'],
-  ['c-mcq-css-1', 'CSS', 'easy', 'Which property controls the space inside an element border?', ['padding', 'margin', 'outline', 'gap'], 'padding'],
-  ['c-mcq-js-1', 'JavaScript', 'easy', 'Which method converts a JSON string into an object?', ['JSON.parse', 'JSON.stringify', 'Object.fromEntries', 'String.raw'], 'JSON.parse'],
+  ['c-mcq-css-1', 'CSS', 'easy', 'Which property controls the space inside an element, between its content and its border?', ['padding', 'margin', 'outline', 'gap'], 'padding'],
+  ['c-mcq-js-1', 'JavaScript', 'easy', 'Which method converts a JSON string into a JavaScript object?', ['JSON.parse', 'JSON.stringify', 'Object.fromEntries', 'String.raw'], 'JSON.parse'],
   ['c-mcq-py-1', 'Python', 'easy', 'Which keyword defines a function in Python?', ['def', 'func', 'function', 'lambda-only'], 'def'],
-  ['c-mcq-css-2', 'CSS', 'medium', 'Given equal specificity, which rule wins when two selectors match the same element?', ['The one declared last in source order', 'The one with the shorter selector', 'The one written in a <style> tag', 'The one using a class instead of an id'], 'The one declared last in source order'],
-  ['c-mcq-js-2', 'JavaScript', 'medium', 'What is logged? console.log(typeof NaN);', ['number', 'NaN', 'undefined', 'object'], 'number'],
+  ['c-mcq-css-2', 'CSS', 'medium', 'Given equal specificity, which of two conflicting rules wins?', ['The one declared last in source order', 'The one with the shorter selector', 'The one written in a <style> tag', 'The one using a class instead of an id'], 'The one declared last in source order'],
+  ['c-mcq-js-2', 'JavaScript', 'medium', 'What does console.log(typeof NaN) print?', ['number', 'NaN', 'undefined', 'object'], 'number'],
+  ['c-mcq-js-eq', 'JavaScript', 'medium', 'What is the key difference between == and === in JavaScript?', ['== allows type coercion before comparing; === requires both value and type to match', '=== only works on numbers, == works on any type', 'They behave identically in modern JavaScript', '== compares object references, === compares values'], '== allows type coercion before comparing; === requires both value and type to match'],
   ['c-mcq-py-2', 'Python', 'medium', 'What does `list(range(5))[-2:]` evaluate to?', ['[3, 4]', '[4]', '[2, 3]', '[3]'], '[3, 4]'],
-  ['c-mcq-js-3', 'JavaScript', 'medium', 'Which statement about `let` inside a for-loop closure is correct?', ['Each iteration gets its own binding, so closures capture the value at that iteration', 'All closures share one binding, so they all see the final value', 'let behaves identically to var inside loops', 'let cannot be used in a for-loop header'], 'Each iteration gets its own binding, so closures capture the value at that iteration'],
-  ['c-mcq-js-4', 'JavaScript', 'hard', 'What is the output? (() => { console.log(this); }).call({a:1});', ['The this from the surrounding lexical scope, unaffected by call()', '{a: 1}', 'undefined in all cases', 'A TypeError is thrown'], 'The this from the surrounding lexical scope, unaffected by call()'],
-  ['c-mcq-js-5', 'JavaScript', 'hard', 'In the event loop, which runs first after the current synchronous code finishes: a resolved Promise .then callback or a setTimeout(fn, 0) callback?', ['The Promise .then callback (microtask)', 'The setTimeout callback (macrotask)', 'They always run in the order they were written', 'It is undefined behavior in the spec'], 'The Promise .then callback (microtask)'],
-  ['c-mcq-py-3', 'Python', 'hard', 'Why is `def f(x, cache=[]):` considered a common Python bug?', ['The default mutable list is created once and shared/mutated across calls', 'Python forbids mutable default arguments and raises a SyntaxError', 'Lists cannot be used as default arguments at all', 'It causes a memory leak that crashes the interpreter'], 'The default mutable list is created once and shared/mutated across calls'],
-  ['c-mcq-py-4', 'Python', 'hard', 'What best describes the effect of the GIL (Global Interpreter Lock) in CPython?', ['Only one thread executes Python bytecode at a time, limiting CPU-bound multithreading speedups', 'It prevents any concurrency at all, including async and multiprocessing', 'It only affects I/O-bound programs, never CPU-bound ones', 'It was removed permanently starting in Python 3.0'], 'Only one thread executes Python bytecode at a time, limiting CPU-bound multithreading speedups'],
-  ['c-mcq-js-6', 'JavaScript', 'hard', 'What does Array.prototype.sort() do by default with numeric elements like [10, 2, 1]?', ['Converts elements to strings and sorts lexicographically, giving [1, 10, 2]', 'Sorts numerically ascending, giving [1, 2, 10]', 'Throws a TypeError because no comparator was given', 'Leaves the array unchanged'], 'Converts elements to strings and sorts lexicographically, giving [1, 10, 2]'],
-  ['c-mcq-css-3', 'CSS', 'hard', 'Which selector has higher specificity: `#nav .item` or `.container .container .item`?', ['#nav .item, because an id outweighs any number of classes', '.container .container .item, because it has more class selectors', 'They are exactly equal', 'Specificity cannot be compared across different selectors'], '#nav .item, because an id outweighs any number of classes'],
-  ['c-mcq-algo-1', 'Algorithms', 'hard', 'What is the average-case time complexity of searching for a key in a well-implemented hash map?', ['O(1)', 'O(log n)', 'O(n)', 'O(n log n)'], 'O(1)'],
-  ['c-mcq-algo-2', 'Algorithms', 'hard', 'Which algorithmic technique does merge sort use?', ['Divide and conquer', 'Dynamic programming', 'Greedy selection', 'Backtracking'], 'Divide and conquer']
+  ['c-mcq-js-3', 'JavaScript', 'medium', 'Inside a for-loop written with `let`, what happens to the loop variable captured by a closure created each iteration?', ['Each iteration gets its own binding, so each closure remembers the value from its own iteration', 'All closures share one binding, so they all see the final value', 'let behaves identically to var inside loops', 'let cannot be used in a for-loop header'], 'Each iteration gets its own binding, so each closure remembers the value from its own iteration'],
+  ['c-mcq-algo-1', 'Algorithms', 'medium', 'What is the average-case time complexity of looking up a key in a well-implemented hash map?', ['O(1)', 'O(log n)', 'O(n)', 'O(n log n)'], 'O(1)'],
+  ['c-mcq-algo-2', 'Algorithms', 'medium', 'Merge sort repeatedly splits a list in half, sorts each half, then combines the results. What is this general technique called?', ['Divide and conquer', 'Dynamic programming', 'Greedy selection', 'Backtracking'], 'Divide and conquer'],
+  ['c-mcq-js-4', 'JavaScript', 'hard', 'What does `this` refer to inside an arrow function, regardless of how that arrow function is later called?', ['Whatever `this` was in the surrounding scope where the arrow function was defined', 'The object the arrow function happens to be called on', 'undefined in all cases', 'The global object, always'], 'Whatever `this` was in the surrounding scope where the arrow function was defined'],
+  ['c-mcq-js-5', 'JavaScript', 'hard', 'After the current script finishes, which runs first: a resolved Promise\'s .then callback, or a setTimeout(fn, 0) callback?', ['The Promise callback, because it is a microtask', 'The setTimeout callback, because it was scheduled first', 'They always run in the order they were written in the source', 'It is unspecified and differs between browsers'], 'The Promise callback, because it is a microtask'],
+  ['c-mcq-py-3', 'Python', 'hard', 'Why does `def f(x, cache=[]):` surprise people the first time they see it?', ['The default list is created once, so it is silently shared and mutated across every call that relies on it', 'Python raises a SyntaxError for mutable default arguments', 'Lists are not allowed as default arguments at all', 'It causes a memory leak that eventually crashes the program'], 'The default list is created once, so it is silently shared and mutated across every call that relies on it'],
+  ['c-mcq-js-6', 'JavaScript', 'hard', 'What does `[10, 2, 1].sort()` return by default in JavaScript?', ['[1, 10, 2], because sort() converts elements to strings and compares them lexicographically', '[1, 2, 10], because sort() compares numbers numerically by default', 'A TypeError, because no comparator function was provided', 'The array is left unchanged'], '[1, 10, 2], because sort() converts elements to strings and compares them lexicographically'],
+  ['c-mcq-css-3', 'CSS', 'hard', 'Which selector wins: `#nav .item` or `.container .container .item`?', ['#nav .item, because a single id outweighs any number of class selectors', '.container .container .item, because it has more class selectors overall', 'They are exactly equal in specificity', 'Specificity cannot be compared across different selectors'], '#nav .item, because a single id outweighs any number of class selectors']
 ];
 
 const codingTrueFalse = [
   ['c-tf-1', 'JavaScript', 'easy', 'True or false: Array.prototype.map mutates the original array.', false],
   ['c-tf-2', 'Python', 'medium', 'True or false: Python lists and tuples are both mutable.', false],
-  ['c-tf-3', 'JavaScript', 'hard', 'True or false: `const` prevents the properties of an object from being changed.', false],
-  ['c-tf-4', 'Python', 'hard', 'True or false: In Python, a shallow copy of a list containing nested lists still shares references to those nested lists.', true],
-  ['c-tf-5', 'Algorithms', 'hard', 'True or false: Quicksort has a worst-case time complexity of O(n log n).', false]
+  ['c-tf-3', 'JavaScript', 'medium', 'True or false: Declaring an object with `const` prevents its properties from being changed.', false],
+  ['c-tf-4', 'Python', 'hard', 'True or false: A shallow copy of a list containing nested lists still shares references to those nested lists with the original.', true],
+  ['c-tf-5', 'Algorithms', 'medium', 'True or false: Quicksort has a worst-case time complexity of O(n log n).', false]
 ];
 
 const codingMultiSelect = [
@@ -61,11 +61,9 @@ const codingMultiSelect = [
 ];
 
 const codingWritten = [
-  ['c-design-1', 'text', 'System Design', 'hard', 'Design a rate limiter for a public API used by many clients. Describe the algorithm you would use, the data it needs to track, and how it behaves under a burst of traffic.'],
-  ['c-design-2', 'text', 'System Design', 'hard', 'You need to paginate through 50 million rows efficiently. Compare offset-based pagination to keyset (cursor) pagination and explain which you would choose and why.'],
-  ['c-design-3', 'text', 'Code Review', 'hard', 'A teammate submits a function that fetches a list, then calls `await` inside a `for...of` loop to process each item one at a time. Explain the performance implication and how you would improve it while keeping error handling correct.'],
-  ['c-design-4', 'text', 'Algorithms', 'medium', 'Explain, in your own words, the difference between an O(n^2) and an O(n log n) algorithm, and give a concrete example of each.'],
-  ['c-design-5', 'text', 'Debugging', 'medium', 'Describe your general process for tracking down a bug that only reproduces in production and not locally.']
+  ['c-design-1', 'text', 'System Design', 'hard', 'Design a rate limiter for a public API used by many different clients. Explain the algorithm you would use, what data it needs to track per client, and how it behaves when traffic suddenly bursts.'],
+  ['c-design-2', 'text', 'System Design', 'medium', 'You need to paginate through 50 million rows efficiently. Compare offset-based pagination to keyset (cursor) pagination, and explain which you would choose and why.'],
+  ['c-design-5', 'text', 'Debugging', 'medium', 'Describe your process for tracking down a bug that only shows up in production and will not reproduce locally.']
 ];
 
 // Self-contained JavaScript functions, auto-graded against hidden test cases.
@@ -96,64 +94,53 @@ const codingCodePython = [
 ];
 
 // ---------------------------------------------------------------------------
-// Cybersecurity track question bank (deliberately hard; this is meant to be
-// a demanding security assessment, not an awareness quiz)
+// Cybersecurity track question bank. This track is entirely objective
+// (multiple choice / true-false / select-all) -- no free-response written
+// questions -- so it can be graded consistently and instantly. Questions
+// favor real, practical judgment over obscure trivia.
 // ---------------------------------------------------------------------------
 
 const cyberMcq = [
-  ['s-mcq-1', 'Cybersecurity', 'easy', 'Which cookie flag prevents JavaScript from reading a cookie?', ['HttpOnly', 'Secure', 'SameSite', 'Path'], 'HttpOnly'],
-  ['s-mcq-2', 'Cybersecurity', 'easy', 'Which attack uses a victim browser to submit an unwanted authenticated request?', ['CSRF', 'SQL indexing', 'Cache warming', 'DNS prefetching'], 'CSRF'],
-  ['s-mcq-3', 'Cybersecurity', 'medium', 'Which principle grants only the access required for a task?', ['Least privilege', 'Open access', 'Security by obscurity', 'Global admin'], 'Least privilege'],
-  ['s-mcq-4', 'Cybersecurity', 'medium', 'Which vulnerability is caused by placing untrusted input directly into a SQL string?', ['SQL injection', 'Clickjacking', 'Race condition', 'Path compression'], 'SQL injection'],
-  ['s-mcq-5', 'Cybersecurity', 'medium', 'A JWT verifier reads the "alg" field from the token itself and uses it to select the verification algorithm, including allowing "none". What is this vulnerable to?', ['An attacker forging an unsigned/self-declared token that is trusted as valid', 'Excessive token size causing denial of service', 'Cookies being set without the Secure flag', 'The token expiring too early'], 'An attacker forging an unsigned/self-declared token that is trusted as valid'],
-  ['s-mcq-6', 'Cybersecurity', 'hard', 'A server accepts a user-supplied URL and fetches it server-side to generate a link preview, with no restriction on destination. What is the primary risk?', ['Server-Side Request Forgery (SSRF) reaching internal-only services (e.g. cloud metadata endpoints)', 'Cross-site scripting in the response body', 'Clickjacking of the preview widget', 'CSRF against the preview endpoint'], 'Server-Side Request Forgery (SSRF) reaching internal-only services (e.g. cloud metadata endpoints)'],
-  ['s-mcq-7', 'Cybersecurity', 'hard', 'An XML parser is configured with external entity resolution enabled and parses untrusted XML. What class of attack does this enable?', ['XML External Entity (XXE) injection, potentially leaking local files or enabling SSRF', 'Cross-site request forgery', 'Clickjacking', 'Session fixation'], 'XML External Entity (XXE) injection, potentially leaking local files or enabling SSRF'],
-  ['s-mcq-8', 'Cybersecurity', 'hard', 'What is the core risk of deserializing untrusted, attacker-controlled data using a language-native serialization format (e.g. Java serialization, Python pickle)?', ['It can lead to arbitrary code execution during deserialization, not just data corruption', 'It only risks type confusion, never code execution', 'It is safe as long as TLS is used for transport', 'It only affects performance, not security'], 'It can lead to arbitrary code execution during deserialization, not just data corruption'],
-  ['s-mcq-9', 'Cybersecurity', 'hard', 'A check-then-act sequence (e.g. checking a file does not exist, then creating it) is exploited by an attacker who acts in between the check and the act. What is this vulnerability class called?', ['Time-of-check to time-of-use (TOCTOU) race condition', 'Cross-site scripting', 'Clickjacking', 'Man-in-the-middle downgrade'], 'Time-of-check to time-of-use (TOCTOU) race condition'],
-  ['s-mcq-10', 'Cybersecurity', 'hard', 'Which block cipher mode is classically vulnerable to padding oracle attacks when error messages distinguish padding failures from other failures?', ['CBC (with padding, and a verbose error oracle)', 'CTR', 'GCM used correctly with authentication checked first', 'ECB with no padding scheme at all'], 'CBC (with padding, and a verbose error oracle)'],
-  ['s-mcq-11', 'Cybersecurity', 'hard', 'What is the consequence of reusing the same nonce with the same key in AES-GCM across two different messages?', ['It can catastrophically break both confidentiality and the authentication guarantee for those messages', 'It only slightly weakens confidentiality but authentication remains fully intact', 'It has no security impact if the key itself is strong', 'It only matters for CBC mode, not GCM'], 'It can catastrophically break both confidentiality and the authentication guarantee for those messages'],
-  ['s-mcq-12', 'Cybersecurity', 'hard', 'Which best distinguishes an HMAC from a digital signature?', ['HMAC uses a shared symmetric secret so anyone who can verify can also forge; signatures use a private/public keypair so verifiers cannot forge', 'HMAC is always weaker cryptographically than a digital signature', 'Digital signatures cannot provide integrity, only confidentiality', 'They are cryptographically identical constructs'], 'HMAC uses a shared symmetric secret so anyone who can verify can also forge; signatures use a private/public keypair so verifiers cannot forge'],
-  ['s-mcq-13', 'Cybersecurity', 'hard', 'What is the primary purpose of HSTS (HTTP Strict Transport Security)?', ['Force browsers to only use HTTPS for a domain going forward, mitigating SSL-stripping/downgrade attacks', 'Encrypt cookies at rest on the server', 'Prevent SQL injection', 'Replace the need for a valid TLS certificate'], 'Force browsers to only use HTTPS for a domain going forward, mitigating SSL-stripping/downgrade attacks'],
-  ['s-mcq-14', 'Cybersecurity', 'hard', 'Which describes a mass assignment vulnerability?', ['Client-supplied fields are bound directly onto a data model without an allowlist, letting attackers set fields like "isAdmin"', 'Too many database connections being opened at once', 'A form accepting more characters than expected in a text field', 'A cross-site scripting payload delivered via a mass email'], 'Client-supplied fields are bound directly onto a data model without an allowlist, letting attackers set fields like "isAdmin"'],
-  ['s-mcq-15', 'Cybersecurity', 'hard', 'Server-Side Template Injection (SSTI) most commonly arises when...', ['Untrusted user input is concatenated directly into a template string that is then rendered/evaluated by the template engine', 'A CSS file references an external font', 'A cookie is missing the Secure flag', 'An HTML comment contains a version number'], 'Untrusted user input is concatenated directly into a template string that is then rendered/evaluated by the template engine'],
-  ['s-mcq-16', 'Cybersecurity', 'hard', 'What does the "Zero Trust" security model fundamentally assume?', ['No user, device, or network location should be implicitly trusted; every request must be continuously verified', 'Internal network traffic is always safe once past the perimeter firewall', 'VPN access alone is sufficient authorization for internal resources', 'Trust should be granted permanently after the first successful login'], 'No user, device, or network location should be implicitly trusted; every request must be continuously verified'],
-  ['s-mcq-17', 'Cybersecurity', 'hard', 'DNS rebinding attacks are used to bypass which browser security mechanism?', ['The Same-Origin Policy, by changing what an already-trusted hostname resolves to after the initial check', 'Content-Security-Policy nonce validation', 'HttpOnly cookie protections', 'Certificate pinning'], 'The Same-Origin Policy, by changing what an already-trusted hostname resolves to after the initial check'],
-  ['s-mcq-18', 'Cybersecurity', 'hard', 'Meltdown and Spectre are best classified as...', ['Speculative-execution CPU side-channel attacks that can leak memory across trust boundaries', 'Application-layer SQL injection variants', 'DNS cache poisoning techniques', 'Social-engineering phishing kits'], 'Speculative-execution CPU side-channel attacks that can leak memory across trust boundaries'],
-  ['s-mcq-19', 'Cybersecurity', 'hard', 'Why is Argon2 generally preferred over a fast general-purpose hash (like unsalted SHA-256) for password storage?', ['It is deliberately slow and memory-hard, making large-scale offline/GPU cracking far more expensive', 'It produces a shorter output, saving database space', 'It is reversible with the right secret key', 'It removes the need for per-user salts entirely'], 'It is deliberately slow and memory-hard, making large-scale offline/GPU cracking far more expensive'],
-  ['s-mcq-20', 'Cybersecurity', 'hard', 'A container running as root, with the host Docker socket mounted inside it, primarily creates the risk of...', ['Container escape and full host compromise', 'Slower container startup times only', 'Increased image size only', 'Loss of IPv6 connectivity'], 'Container escape and full host compromise'],
-  ['s-mcq-21', 'Cybersecurity', 'hard', 'A supply-chain attack via a malicious, similarly-named open-source package (e.g. "reqeusts" instead of "requests") is known as...', ['Typosquatting', 'Clickjacking', 'Credential stuffing', 'Cache poisoning'], 'Typosquatting'],
-  ['s-mcq-22', 'Cybersecurity', 'hard', 'Which best describes a timing side-channel attack against an authentication check?', ['Measuring response-time differences to infer secret information, such as how much of a token matched byte-by-byte', 'Sending malformed HTTP headers to crash the server', 'Overloading the server with concurrent connections', 'Guessing passwords from a public data breach dump'], 'Measuring response-time differences to infer secret information, such as how much of a token matched byte-by-byte']
+  ['s-mcq-1', 'Cybersecurity', 'easy', 'Which cookie flag prevents JavaScript from reading a cookie\'s value?', ['HttpOnly', 'Secure', 'SameSite', 'Path'], 'HttpOnly'],
+  ['s-mcq-2', 'Cybersecurity', 'easy', 'Which attack tricks a logged-in victim\'s browser into submitting an unwanted request to a site they\'re authenticated with?', ['CSRF', 'SQL indexing', 'Cache warming', 'DNS prefetching'], 'CSRF'],
+  ['s-mcq-enum', 'Cybersecurity', 'easy', 'A password reset form always replies "If that email exists, we\'ve sent a link," no matter what. What is this design meant to prevent?', ['An attacker discovering which email addresses have accounts (user enumeration)', 'Cross-site scripting', 'SQL injection', 'Session fixation'], 'An attacker discovering which email addresses have accounts (user enumeration)'],
+  ['s-mcq-3', 'Cybersecurity', 'medium', 'Which principle means giving a user or service only the access it actually needs, nothing more?', ['Least privilege', 'Open access', 'Security by obscurity', 'Global admin'], 'Least privilege'],
+  ['s-mcq-4', 'Cybersecurity', 'medium', 'Which vulnerability results from placing untrusted input directly into a SQL string instead of using parameters?', ['SQL injection', 'Clickjacking', 'Race condition', 'Path compression'], 'SQL injection'],
+  ['s-mcq-idor', 'Cybersecurity', 'medium', 'An API returns another user\'s private data when you change /profile?id=101 to /profile?id=102, with no check that the requester actually owns that record. What is this called?', ['Insecure Direct Object Reference (IDOR)', 'Cross-site scripting', 'Cross-site request forgery', 'DNS cache poisoning'], 'Insecure Direct Object Reference (IDOR)'],
+  ['s-mcq-upload', 'Cybersecurity', 'medium', 'A feature lets users upload profile pictures. Which practice matters most for keeping it safe?', ['Validate the actual file content server-side and store uploads outside the web root with generated names, not user-supplied ones', 'Trust the file extension the browser reports', 'Rely on client-side JavaScript to check the file type', 'Only limit uploads to files under 50MB'], 'Validate the actual file content server-side and store uploads outside the web root with generated names, not user-supplied ones'],
+  ['s-mcq-hsts', 'Cybersecurity', 'medium', 'What is the main purpose of HSTS (HTTP Strict Transport Security)?', ['It tells browsers to only ever use HTTPS for a domain, closing the window for SSL-stripping/downgrade attacks', 'It encrypts cookies at rest on the server', 'It prevents SQL injection', 'It replaces the need for a valid TLS certificate'], 'It tells browsers to only ever use HTTPS for a domain, closing the window for SSL-stripping/downgrade attacks'],
+  ['s-mcq-zt', 'Cybersecurity', 'medium', 'What does the "Zero Trust" security model assume?', ['No user, device, or network location should be trusted automatically; every request is verified on its own merits', 'Traffic inside the corporate network is always safe', 'A VPN connection is enough authorization for internal resources', 'Trust should persist permanently once a user logs in once'], 'No user, device, or network location should be trusted automatically; every request is verified on its own merits'],
+  ['s-mcq-stride', 'Cybersecurity', 'medium', 'STRIDE is a common threat-modeling framework. Which of these is NOT one of its six categories?', ['Obfuscation', 'Spoofing', 'Repudiation', 'Elevation of Privilege'], 'Obfuscation'],
+  ['s-mcq-mass', 'Cybersecurity', 'medium', 'A signup endpoint binds every field from the incoming JSON body directly onto the User model, including one the client should never control. What is this vulnerability called?', ['Mass assignment', 'Clickjacking', 'A cross-site scripting payload', 'Excessive database connections'], 'Mass assignment'],
+  ['s-mcq-argon', 'Cybersecurity', 'medium', 'Why is Argon2 preferred over a fast general-purpose hash like unsalted SHA-256 for storing passwords?', ['It is deliberately slow and memory-hard, making large-scale offline cracking far more expensive', 'It produces a shorter output, saving database space', 'It is reversible with a secret key', 'It removes the need for per-user salts entirely'], 'It is deliberately slow and memory-hard, making large-scale offline cracking far more expensive'],
+  ['s-mcq-5', 'Cybersecurity', 'hard', 'A JWT verifier reads the "alg" field from the token itself and uses whatever it says to pick the verification method, including "none". What does this let an attacker do?', ['Forge a token that declares itself unsigned and have the server accept it as valid anyway', 'Cause excessive token size and a denial of service', 'Read cookies that lack the Secure flag', 'Force the token to expire early'], 'Forge a token that declares itself unsigned and have the server accept it as valid anyway'],
+  ['s-mcq-6', 'Cybersecurity', 'hard', 'A server accepts a user-supplied URL and fetches it server-side to build a link preview, with no restriction on where that URL can point. What is the primary risk?', ['Server-Side Request Forgery (SSRF) reaching internal-only services, like a cloud metadata endpoint', 'Cross-site scripting in the response body', 'Clickjacking of the preview widget', 'CSRF against the preview endpoint'], 'Server-Side Request Forgery (SSRF) reaching internal-only services, like a cloud metadata endpoint'],
+  ['s-mcq-7', 'Cybersecurity', 'hard', 'An XML parser has external entity resolution turned on and parses XML supplied by users. What attack does this open the door to?', ['XML External Entity (XXE) injection, which can leak local files or trigger SSRF', 'Cross-site request forgery', 'Clickjacking', 'Session fixation'], 'XML External Entity (XXE) injection, which can leak local files or trigger SSRF'],
+  ['s-mcq-8', 'Cybersecurity', 'hard', 'What is the real danger of deserializing attacker-controlled data using a language-native format like Java serialization or Python pickle?', ['It can lead to arbitrary code execution during deserialization, not just corrupted data', 'It only risks type confusion, never code execution', 'It is safe as long as the connection uses TLS', 'It only affects performance, not security'], 'It can lead to arbitrary code execution during deserialization, not just corrupted data'],
+  ['s-mcq-9', 'Cybersecurity', 'hard', 'Code checks that a file does not exist, then creates it a moment later, and an attacker manages to act in between those two steps. What is this vulnerability class called?', ['A time-of-check to time-of-use (TOCTOU) race condition', 'Cross-site scripting', 'Clickjacking', 'A man-in-the-middle downgrade'], 'A time-of-check to time-of-use (TOCTOU) race condition'],
+  ['s-mcq-10', 'Cybersecurity', 'hard', 'Which block cipher mode is classically vulnerable to padding oracle attacks, when error messages reveal whether padding was valid?', ['CBC, when a verbose error message distinguishes padding failures from other failures', 'CTR mode', 'GCM, when authentication is checked before decryption', 'ECB with no padding scheme at all'], 'CBC, when a verbose error message distinguishes padding failures from other failures'],
+  ['s-mcq-11', 'Cybersecurity', 'hard', 'What happens if the same nonce is reused with the same key in AES-GCM across two different messages?', ['Both confidentiality and the authentication guarantee for those messages can be broken', 'Confidentiality weakens slightly but authentication is unaffected', 'Nothing, as long as the key itself is strong', 'It only matters for CBC mode, never for GCM'], 'Both confidentiality and the authentication guarantee for those messages can be broken'],
+  ['s-mcq-12', 'Cybersecurity', 'hard', 'What is the key difference between an HMAC and a digital signature?', ['HMAC uses one shared secret, so anyone who can verify it can also forge it; a signature uses a private/public keypair, so verifiers cannot forge it', 'HMAC is always cryptographically weaker than a signature', 'A signature can only provide confidentiality, not integrity', 'They are cryptographically identical constructs'], 'HMAC uses one shared secret, so anyone who can verify it can also forge it; a signature uses a private/public keypair, so verifiers cannot forge it'],
+  ['s-mcq-15', 'Cybersecurity', 'hard', 'Server-Side Template Injection (SSTI) most often happens when...', ['Untrusted user input is concatenated directly into a template string that the template engine then renders or evaluates', 'A CSS file references an external font', 'A cookie is missing the Secure flag', 'An HTML comment contains a version number'], 'Untrusted user input is concatenated directly into a template string that the template engine then renders or evaluates'],
+  ['s-mcq-timing', 'Cybersecurity', 'hard', 'A login check compares a supplied token to the real one byte-by-byte and stops as soon as it finds a mismatch. Why is this risky?', ['An attacker can measure tiny response-time differences to infer the correct token one byte at a time', 'It uses too much CPU per request', 'It leaks the token directly in the HTTP response', 'It is only a problem for GET requests, never POST'], 'An attacker can measure tiny response-time differences to infer the correct token one byte at a time'],
+  ['s-mcq-ir', 'Cybersecurity', 'hard', 'Monitoring shows mass file renames and ransom notes appearing across a file server in the last few minutes. What should happen first?', ['Contain the incident by isolating the affected systems from the network before anything else', 'Immediately restore all files from the most recent backup', 'Email every employee a detailed description of the attack', 'Wait for the next scheduled maintenance window to investigate'], 'Contain the incident by isolating the affected systems from the network before anything else']
 ];
 
 const cyberTrueFalse = [
-  ['s-tf-1', 'Cybersecurity', 'easy', 'True or false: Client-side validation alone is sufficient to protect an API endpoint.', false],
-  ['s-tf-2', 'Cybersecurity', 'easy', 'True or false: Storing a session token in an HttpOnly cookie protects it from being read by JavaScript.', true],
-  ['s-tf-3', 'Cybersecurity', 'hard', 'True or false: bcrypt has a well-known effective input limit of around 72 bytes, after which extra characters are ignored.', true],
-  ['s-tf-4', 'Cybersecurity', 'hard', 'True or false: SameSite=Strict cookies are still sent when a user clicks a link on another site that navigates to yours (a top-level GET navigation).', false],
-  ['s-tf-5', 'Cybersecurity', 'hard', 'True or false: A Web Application Firewall (WAF) alone is a complete defense against all forms of injection attacks.', false],
-  ['s-tf-6', 'Cybersecurity', 'hard', 'True or false: Mutual TLS (mTLS) authenticates both the client and the server to each other using certificates.', true],
+  ['s-tf-1', 'Cybersecurity', 'easy', 'True or false: Client-side validation alone is enough to protect an API endpoint.', false],
+  ['s-tf-2', 'Cybersecurity', 'easy', 'True or false: Storing a session token in an HttpOnly cookie prevents it from being read by JavaScript.', true],
+  ['s-tf-3', 'Cybersecurity', 'medium', 'True or false: bcrypt has a well-known effective input limit of around 72 bytes, after which extra characters are ignored.', true],
+  ['s-tf-4', 'Cybersecurity', 'medium', 'True or false: A cookie set with SameSite=Strict is still sent when a user clicks a link on another site that navigates to yours.', false],
+  ['s-tf-5', 'Cybersecurity', 'medium', 'True or false: A Web Application Firewall (WAF) alone is a complete defense against every form of injection attack.', false],
+  ['s-tf-6', 'Cybersecurity', 'medium', 'True or false: Mutual TLS (mTLS) authenticates both the client and the server to each other using certificates.', true],
   ['s-tf-7', 'Cybersecurity', 'hard', 'True or false: Certificate Transparency logs make it possible to publicly detect certificates that were mis-issued for a domain.', true]
 ];
 
 const cyberMultiSelect = [
   ['s-ms-1', 'Cybersecurity', 'medium', 'Select all practices that help prevent SQL injection.', ['Parameterized queries', 'Least-privilege database accounts', 'Storing passwords as plain text', 'Input validation'], ['Parameterized queries', 'Least-privilege database accounts', 'Input validation']],
-  ['s-ms-2', 'Cybersecurity', 'hard', 'Select all mitigations that meaningfully reduce SSRF risk.', ['Allowlisting permitted outbound destinations', 'Blocking the app from reaching internal metadata/link-local addresses', 'Trusting any URL the client supplies', 'Resolving and validating DNS/IP before making the request'], ['Allowlisting permitted outbound destinations', 'Blocking the app from reaching internal metadata/link-local addresses', 'Resolving and validating DNS/IP before making the request']],
-  ['s-ms-3', 'Cybersecurity', 'hard', 'Select all properties a secure password hashing scheme should have.', ['Deliberately slow / computationally expensive', 'Uses a unique per-user random salt', 'Reversible with a secret key so the plaintext can be recovered', 'Memory-hard, to resist GPU/ASIC cracking'], ['Deliberately slow / computationally expensive', 'Uses a unique per-user random salt', 'Memory-hard, to resist GPU/ASIC cracking']],
+  ['s-ms-2', 'Cybersecurity', 'medium', 'Select all mitigations that meaningfully reduce SSRF risk.', ['Allowlisting permitted outbound destinations', 'Blocking the app from reaching internal metadata/link-local addresses', 'Trusting any URL the client supplies', 'Resolving and validating DNS/IP before making the request'], ['Allowlisting permitted outbound destinations', 'Blocking the app from reaching internal metadata/link-local addresses', 'Resolving and validating DNS/IP before making the request']],
+  ['s-ms-3', 'Cybersecurity', 'medium', 'Select all properties a secure password hashing scheme should have.', ['Deliberately slow / computationally expensive', 'Uses a unique per-user random salt', 'Reversible with a secret key so the plaintext can be recovered', 'Memory-hard, to resist GPU/ASIC cracking'], ['Deliberately slow / computationally expensive', 'Uses a unique per-user random salt', 'Memory-hard, to resist GPU/ASIC cracking']],
   ['s-ms-4', 'Cybersecurity', 'hard', 'Select all indicators consistent with an active ransomware incident.', ['Mass renaming of files with a new, unfamiliar extension', 'Ransom note files suddenly appearing in many folders', 'A single employee\u2019s badge photo being slightly blurry', 'Shadow copy / backup deletion commands in recent process history'], ['Mass renaming of files with a new, unfamiliar extension', 'Ransom note files suddenly appearing in many folders', 'Shadow copy / backup deletion commands in recent process history']]
-];
-
-const cyberWritten = [
-  ['s-scenario-1', 'text', 'Cybersecurity Scenario', 'easy', 'A login form has no rate limit and reveals whether an email exists. Explain two risks and two fixes.'],
-  ['s-scenario-2', 'text', 'Cybersecurity Scenario', 'medium', 'A file upload feature accepts any file type. Describe a secure validation and storage design.'],
-  ['s-scenario-3', 'text', 'Cybersecurity Scenario', 'medium', 'An API returns another user\'s profile when the id is changed in the URL. Explain the vulnerability (IDOR) and the fix.'],
-  ['s-vuln-1', 'text', 'Vulnerability Analysis', 'hard', 'A server verifies a JWT by first decoding the unsigned header, reading the "alg" field, and using that algorithm (including "none") to verify the signature. Walk through exactly how an attacker exploits this, and describe the fix in detail.'],
-  ['s-vuln-2', 'text', 'Vulnerability Analysis', 'hard', 'A crypto library encrypts requests with AES-GCM but generates the nonce as a counter that resets to zero on every server restart, reusing the same symmetric key. Explain precisely what breaks and how you would redesign nonce generation.'],
-  ['s-vuln-3', 'text', 'Vulnerability Analysis', 'hard', 'An internal microservice fetches a URL supplied by an end user to render a link preview, with no destination restrictions. Design a safe fetcher: what do you allow, what do you block, and where do the checks need to happen to avoid a DNS-rebinding bypass?'],
-  ['s-design-1', 'text', 'Secure Design', 'hard', 'Design a secure admissions-results endpoint. Include authentication, authorization, validation, and audit logging.'],
-  ['s-design-2', 'text', 'Secure Design', 'hard', 'Design account recovery for a student portal without leaking whether an email address exists.'],
-  ['s-design-3', 'text', 'Secure Design', 'hard', 'Produce a STRIDE threat model for a file-upload feature in a student portal: list at least one concrete threat per STRIDE category and a mitigation for each.'],
-  ['s-design-4', 'text', 'Incident Response', 'hard', 'Your monitoring shows mass file renames and ransom notes appearing across a file server in the last ten minutes. Describe, in order, the first hour of your incident response, including containment, evidence preservation (chain of custody), and stakeholder communication.'],
-  ['s-design-5', 'text', 'Secure Design', 'hard', 'Design role-based access control for candidates, graders, and administrators in this very interview platform, including how you would prevent privilege escalation between roles.']
 ];
 
 // ---------------------------------------------------------------------------
@@ -170,8 +157,7 @@ const questions = [
 
   ...cyberMcq.map(([id, area, difficulty, prompt, choices, answer]) => ({ id, type: 'mcq', track: 'cybersecurity', area, difficulty, prompt, choices, answer })),
   ...cyberTrueFalse.map(([id, area, difficulty, prompt, answer]) => ({ id, type: 'true-false', track: 'cybersecurity', area, difficulty, prompt, choices: ['True', 'False'], answer: answer ? 'True' : 'False' })),
-  ...cyberMultiSelect.map(([id, area, difficulty, prompt, choices, answer]) => ({ id, type: 'multi-select', track: 'cybersecurity', area, difficulty, prompt, choices, answer })),
-  ...cyberWritten.map(([id, type, area, difficulty, prompt]) => ({ id, type, track: 'cybersecurity', area, difficulty, prompt }))
+  ...cyberMultiSelect.map(([id, area, difficulty, prompt, choices, answer]) => ({ id, type: 'multi-select', track: 'cybersecurity', area, difficulty, prompt, choices, answer }))
 ];
 const questionsById = new Map(questions.map(question => [question.id, question]));
 
@@ -348,35 +334,39 @@ function buildSessionQuestionSet(track) {
   const pool = questions.filter(question => question.track === track);
 
   if (track === 'coding') {
-    const mcq = pickByDifficultyMix(pool.filter(q => q.type === 'mcq'), { easy: 2, medium: 3, hard: 5 });
-    const trueFalse = pickByDifficultyMix(pool.filter(q => q.type === 'true-false'), { easy: 1, medium: 1, hard: 2 });
+    // Most of the test is multiple-choice / true-false. A small remainder is
+    // free response: a couple of short written prompts, plus a handful of
+    // actual code-writing exercises (the "written" part of a coding test).
+    const mcq = pickByDifficultyMix(pool.filter(q => q.type === 'mcq'), { easy: 2, medium: 3, hard: 4 });
+    const trueFalse = pickByDifficultyMix(pool.filter(q => q.type === 'true-false'), { easy: 1, medium: 2, hard: 1 });
     const multiSelect = pickByDifficultyMix(pool.filter(q => q.type === 'multi-select'), { easy: 0, medium: 1, hard: 1 });
-    const written = pickByDifficultyMix(pool.filter(q => q.type === 'text'), { easy: 0, medium: 1, hard: 2 });
+    const written = pickByDifficultyMix(pool.filter(q => q.type === 'text'), { easy: 0, medium: 1, hard: 1 });
     const jsCode = pool.filter(q => q.type === 'code' && q.language === 'javascript');
     const pyCode = pool.filter(q => q.type === 'code' && q.language === 'python');
     const codePicks = [
       ...pickByDifficultyMix(jsCode.filter(q => q.area.startsWith('Self Coding')), { easy: 1, medium: 0, hard: 0 }),
-      ...pickByDifficultyMix(jsCode.filter(q => q.area.startsWith('Algorithms')), { easy: 0, medium: 0, hard: 2 }),
+      ...pickByDifficultyMix(jsCode.filter(q => q.area.startsWith('Algorithms')), { easy: 0, medium: 0, hard: 1 }),
       ...pickByDifficultyMix(jsCode.filter(q => q.area.startsWith('Debugging')), { easy: 0, medium: 1, hard: 1 }),
-      ...pickByDifficultyMix(pyCode, { easy: 1, medium: 1, hard: 1 })
+      ...pickByDifficultyMix(pyCode, { easy: 1, medium: 1, hard: 0 })
     ];
     return shuffle([...mcq, ...trueFalse, ...multiSelect, ...written, ...codePicks]);
   }
 
-  // cybersecurity track
-  const mcq = pickByDifficultyMix(pool.filter(q => q.type === 'mcq'), { easy: 2, medium: 2, hard: 8 });
-  const trueFalse = pickByDifficultyMix(pool.filter(q => q.type === 'true-false'), { easy: 1, medium: 0, hard: 3 });
-  const multiSelect = pickByDifficultyMix(pool.filter(q => q.type === 'multi-select'), { easy: 0, medium: 1, hard: 2 });
-  const scenario = pickByDifficultyMix(pool.filter(q => q.type === 'text' && q.area === 'Cybersecurity Scenario'), { easy: 1, medium: 1, hard: 0 });
-  const vuln = pickByDifficultyMix(pool.filter(q => q.type === 'text' && q.area === 'Vulnerability Analysis'), { easy: 0, medium: 0, hard: 2 });
-  const design = pickByDifficultyMix(pool.filter(q => q.type === 'text' && (q.area === 'Secure Design' || q.area === 'Incident Response')), { easy: 0, medium: 0, hard: 2 });
-  return shuffle([...mcq, ...trueFalse, ...multiSelect, ...scenario, ...vuln, ...design]);
+  // Cybersecurity track: entirely multiple-choice / true-false / select-all,
+  // no free-response questions at all, so every answer is graded instantly
+  // and consistently.
+  const mcq = pickByDifficultyMix(pool.filter(q => q.type === 'mcq'), { easy: 3, medium: 5, hard: 6 });
+  const trueFalse = pickByDifficultyMix(pool.filter(q => q.type === 'true-false'), { easy: 2, medium: 3, hard: 1 });
+  const multiSelect = pickByDifficultyMix(pool.filter(q => q.type === 'multi-select'), { easy: 0, medium: 2, hard: 1 });
+  return shuffle([...mcq, ...trueFalse, ...multiSelect]);
 }
 
+// Only coding's handful of written prompts (rate limiter design, pagination,
+// production debugging) still fall back to this heuristic -- cybersecurity
+// has no free-response questions left, so it never needs it.
 const KEYWORD_HEURISTIC = ['function', 'def ', 'return', 'const', 'let', 'if', 'map', 'filter', 'reduce', 'replace', 'test', 'length',
-  'auth', 'valid', 'log', 'rate limit', 'least privilege', 'generic', 'hash', 'token', 'cookie', 'csrf', 'sanitize',
-  'idor', 'ssrf', 'xxe', 'jwt', 'nonce', 'deserializ', 'race condition', 'toctou', 'zero trust', 'threat model',
-  'stride', 'chain of custody', 'containment', 'allowlist', 'salt', 'bcrypt', 'argon2', 'gcm', 'padding oracle'];
+  'rate limit', 'token bucket', 'sliding window', 'burst', 'cursor', 'pagination', 'offset', 'index',
+  'log', 'monitor', 'reproduce', 'staging', 'debug'];
 
 function scoreAnswer(question, value = '') {
   if (question.type === 'mcq' || question.type === 'true-false') return value === question.answer ? 1 : 0;
