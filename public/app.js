@@ -66,20 +66,25 @@ function render() {
   updateProgress();
 }
 
+// Note: integrity events are still tracked and sent to the server exactly as
+// before (see sendEvent below) -- they are simply never surfaced to the
+// candidate. flagCount is kept only in case something elsewhere wants an
+// in-memory tally; it is intentionally never rendered to the page or
+// returned by the submit response. Only a reviewer, via the admin console,
+// ever sees flag counts or details.
 function updateIntegrityCounter() {
-  $('integrity-counter').textContent = `${flagCount} flag${flagCount === 1 ? '' : 's'} logged`;
+  // Intentionally a no-op for the candidate-facing UI. The badge in the
+  // topbar shows a static "Session monitored" label (set in index.html)
+  // rather than a live count, so candidates can never infer how many
+  // integrity events they've triggered.
 }
 
-// Sends an integrity event to the server. Routine/expected events (session
-// start, heartbeats) are logged silently; anything that looks like an actual
-// integrity concern also increments the visible counter shown to the
-// candidate, which doubles as a deterrent.
+// Sends an integrity event to the server. Every event (routine or not) is
+// logged server-side for the admin review console; none of it is ever
+// exposed back to the candidate in this UI.
 async function sendEvent(type, detail, severity = 'low', silent = false) {
   if (!sessionId) return;
-  if (!silent) {
-    flagCount += 1;
-    updateIntegrityCounter();
-  }
+  if (!silent) flagCount += 1;
   await api(`/api/sessions/${sessionId}/events`, {
     method: 'POST',
     body: JSON.stringify({ type, detail, severity })
@@ -156,11 +161,24 @@ $('submit').onclick = async () => {
       answers[name] = value;
     }
   }
-  const result = await api(`/api/sessions/${sessionId}/submit`, {
-    method: 'POST',
-    body: JSON.stringify({ answers, website: $('website') ? $('website').value : '' })
-  });
-  $('result').textContent = JSON.stringify(result, null, 2);
+  $('submit').disabled = true;
+  $('submit').textContent = 'Submitting...';
+  try {
+    await api(`/api/sessions/${sessionId}/submit`, {
+      method: 'POST',
+      body: JSON.stringify({ answers, website: $('website') ? $('website').value : '' })
+    });
+    $('result').textContent = 'Your submission has been received. Thank you for completing the assessment -- a reviewer will follow up with next steps. You may now close this tab.';
+    $('result').classList.remove('hidden');
+    $('submit').textContent = 'Submitted';
+    Array.from($('questions').elements).forEach(el => (el.disabled = true));
+  } catch {
+    $('submit').disabled = false;
+    $('submit').textContent = 'Submit final test';
+    $('result').textContent = 'Something went wrong submitting your test. Please try again.';
+    $('result').classList.remove('hidden');
+    $('result').classList.add('warn');
+  }
 };
 
 // --- Anti-cheat instrumentation -------------------------------------------
