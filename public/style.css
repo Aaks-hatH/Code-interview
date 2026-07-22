@@ -234,6 +234,60 @@ pre {
 .track-title { font-weight: 700; color: var(--text); }
 .track-desc { color: var(--muted); font-size: 0.9rem; }
 
+/* Admin analytics dashboard additions -------------------------------------- */
+.overview {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 18px;
+  margin: 18px 0;
+}
+.events-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+.events-table th, .events-table td {
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+.events-table th {
+  background: #eef1f5;
+}
+.events-table tr.sev-high td { background: #fbeeee; }
+.events-table tr.sev-medium td { background: #fdf6ea; }
+.badge-high, .badge-medium, .badge-low {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.badge-high { background: #fbeaea; color: var(--danger); }
+.badge-medium { background: #fdf1de; color: var(--warn); }
+.badge-low { background: #eef1f5; color: var(--muted); }
+.breakdown li {
+  list-style: none;
+  border-bottom: 1px solid var(--border);
+  padding: 8px 0;
+}
+.breakdown li:last-child { border-bottom: none; }
+.prompt-line { color: var(--muted); margin: 4px 0; }
+.answer-line { margin: 4px 0; }
+.inline-pre {
+  display: inline-block;
+  margin: 4px 0 0;
+  padding: 8px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  white-space: pre-wrap;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 0.85rem;
+}
+
 /* Honeypot field: present in the DOM for bots/automation to find, invisible
    and unreachable for real candidates using the real UI. */
 .honeypot {
