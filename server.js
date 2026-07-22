@@ -458,6 +458,7 @@ async function handler(req, res) {
       autoFlagged: false,
       score: null,
       breakdown: null,
+      timing: null,
       review: { status: 'pending', notes: '', reviewer: null, updatedAt: null }
     };
     if (honeypotTriggeredAtStart) recordEvent(session, { type: 'honeypot-triggered', detail: 'Hidden field populated at session start', severity: 'high' });
@@ -497,27 +498,73 @@ async function handler(req, res) {
       recordEvent(session, { type: 'excessive-duration', detail: `Session open for ${Math.round(elapsedSeconds / 60)} minutes`, severity: 'medium' });
     }
 
+    // Admin-facing breakdown: includes the question prompt, the candidate's
+    // raw answer, and the correct answer (where one exists) so a reviewer
+    // never has to cross-reference the question bank by hand.
     session.breakdown = sessionQuestions.map(question => {
       const value = session.answers[question.id];
       const points = scoreAnswer(question, value);
       const auto = question.type === 'code' ? runCodeTests(question.id, String(value || ''), question.language) : null;
-      return { id: question.id, type: question.type, area: question.area, difficulty: question.difficulty, weight: weightFor(question), points, auto };
+      return {
+        id: question.id,
+        type: question.type,
+        area: question.area,
+        difficulty: question.difficulty,
+        weight: weightFor(question),
+        points,
+        auto,
+        prompt: question.prompt,
+        answerGiven: value === undefined ? null : value,
+        correctAnswer: question.answer === undefined ? null : question.answer
+      };
     });
     const earned = session.breakdown.reduce((sum, item) => sum + item.points * item.weight, 0);
     const possible = session.breakdown.reduce((sum, item) => sum + item.weight, 0);
     session.score = { earned: Math.round(earned * 100) / 100, possible, percent: possible ? Math.round((earned / possible) * 100) : 0 };
     session.submittedAt = now();
+    // Timing analytics kept for the admin dashboard only -- never sent to
+    // the candidate.
+    session.timing = {
+      elapsedSeconds: Math.round(elapsedSeconds),
+      secondsPerQuestion: Math.round(secondsPerQuestion * 10) / 10,
+      questionCount: sessionQuestions.length
+    };
     session.review = { status: session.autoFlagged ? 'flagged' : 'pending', notes: session.autoFlagged ? 'Auto-flagged: repeated high-severity integrity events during the session.' : '', reviewer: null, updatedAt: now() };
-    return send(res, 200, { ok: true, score: session.score, message: 'Submission received. A reviewer will finalize your result.' });
+
+    // Intentionally minimal candidate-facing response: no score, no
+    // integrity/flag counts, no breakdown, no events. Candidates only ever
+    // learn that their submission was received; everything else is for the
+    // admin/reviewer view only.
+    return send(res, 200, {
+      ok: true,
+      submitted: true,
+      submittedAt: session.submittedAt,
+      message: 'Submission received. Thank you for completing the assessment -- a reviewer will follow up with next steps.'
+    });
   }
 
   if (req.method === 'GET' && url.pathname === '/api/admin/sessions') {
     if (req.headers.authorization !== `Bearer ${ADMIN_TOKEN}`) return send(res, 401, { error: 'unauthorized' });
     return send(res, 200, {
-      sessions: [...sessions.values()].map(session => ({
-        ...session,
-        integrity: { total: session.events.length, high: session.events.filter(event => event.severity === 'high').length, autoFlagged: session.autoFlagged }
-      }))
+      sessions: [...sessions.values()].map(session => {
+        const severityCounts = { low: 0, medium: 0, high: 0 };
+        const eventTypeCounts = {};
+        for (const event of session.events) {
+          severityCounts[event.severity] = (severityCounts[event.severity] || 0) + 1;
+          eventTypeCounts[event.type] = (eventTypeCounts[event.type] || 0) + 1;
+        }
+        return {
+          ...session,
+          integrity: {
+            total: session.events.length,
+            high: severityCounts.high,
+            medium: severityCounts.medium,
+            low: severityCounts.low,
+            autoFlagged: session.autoFlagged,
+            eventTypeCounts
+          }
+        };
+      })
     });
   }
 
