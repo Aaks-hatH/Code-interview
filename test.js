@@ -164,8 +164,15 @@ test('session lifecycle scores and records integrity events without exposing the
     const submit = await request(server, 'POST', `/api/sessions/${id}/submit`, { answers });
     assert.equal(submit.statusCode, 200);
     const submitPayload = submit.json();
-    assert.ok(submitPayload.score);
+    // Candidates must never see their score, flag/integrity counts, or any
+    // breakdown/event detail -- only a generic confirmation.
+    assert.equal(submitPayload.score, undefined);
     assert.equal(submitPayload.events, undefined);
+    assert.equal(submitPayload.breakdown, undefined);
+    assert.equal(submitPayload.integrity, undefined);
+    assert.equal(submitPayload.ok, true);
+    assert.equal(submitPayload.submitted, true);
+    assert.ok(submitPayload.message);
 
     const unauthorized = await request(server, 'GET', '/api/admin/sessions');
     assert.equal(unauthorized.statusCode, 401);
@@ -179,6 +186,14 @@ test('session lifecycle scores and records integrity events without exposing the
     // so a "suspiciously-fast-completion" high-severity event is expected too.
     assert.ok(found.integrity.high >= 1);
     assert.ok(found.breakdown.length === sessionQuestions.length);
+    // Admin view must be exhaustive: exact score, full event log with
+    // timestamps/types/details/severities, per-question prompt/answer/
+    // correct-answer, and timing analytics.
+    assert.ok(found.score);
+    assert.ok(found.events.every(event => event.at && event.type && event.severity));
+    assert.ok(found.breakdown.every(item => 'prompt' in item && 'answerGiven' in item && 'correctAnswer' in item));
+    assert.ok(found.timing && typeof found.timing.elapsedSeconds === 'number');
+    assert.ok(found.integrity.eventTypeCounts && found.integrity.eventTypeCounts['window-blur'] >= 1);
 
     const review = await request(server, 'POST', `/api/admin/sessions/${id}/review`, { status: 'approved', reviewer: 'Grace', notes: 'Looks solid.' }, { authorization: `Bearer ${require('./server').ADMIN_TOKEN}` });
     assert.equal(review.statusCode, 200);
